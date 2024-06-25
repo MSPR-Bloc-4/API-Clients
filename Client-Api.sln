@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client-Api", "Client-Api\Client-Api.csproj", "{FECB9B25-DF0F-41C5-81FC-E790C3865A7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client-Api", "Client-Api.csproj", "{FECB9B25-DF0F-41C5-81FC-E790C3865A7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
