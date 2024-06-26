@@ -1,6 +1,4 @@
 namespace Client_Api;
-using Google.Cloud.Firestore;
-
 public class Program
 {
     public static void Main(string[] args)
