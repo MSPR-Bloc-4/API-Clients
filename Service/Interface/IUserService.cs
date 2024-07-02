@@ -1,6 +1,6 @@
 using Client_Api.Model;
 
-namespace Client_Api.Service;
+namespace Client_Api.Service.Interface;
 
 public interface IUserService
 {

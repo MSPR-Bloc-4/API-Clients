@@ -1,18 +1,12 @@
-using System.IO;
 using Client_Api.Configuration;
 using Client_Api.Repository;
 using Client_Api.Repository.Interface;
 using Client_Api.Service;
+using Client_Api.Service.Interface;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Google.Cloud.Firestore.V1;
-using Grpc.Auth;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using PubSubLibrary;
 
 namespace Client_Api
 {
@@ -56,11 +50,6 @@ namespace Client_Api
                     new EmailProvider()
                     }
                 });
-            });
-            
-            services.AddSingleton<PubSubService>(provider =>
-            {
-                return new PubSubService(firebaseConfig.ProjectId, credential.ToChannelCredentials());
             });
 
             services.AddSingleton(db);
