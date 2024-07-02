@@ -2,14 +2,17 @@ using System.IO;
 using Client_Api.Configuration;
 using Client_Api.Repository;
 using Client_Api.Repository.Interface;
+using Client_Api.Service;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
+using Grpc.Auth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using PubSubLibrary;
 
 namespace Client_Api
 {
@@ -33,27 +36,36 @@ namespace Client_Api
                 credential = GoogleCredential.FromStream(stream);
             }
 
-            FirestoreDb db = FirestoreDb.Create(firebaseConfig.ProjectId, new FirestoreClientBuilder
+            FirestoreDbBuilder builder = new FirestoreDbBuilder
             {
+                ProjectId = firebaseConfig.ProjectId,
+                DatabaseId = "user",
                 Credential = credential
-            }.Build());
+            };
+
+            FirestoreDb db = builder.Build();
 
             services.AddSingleton(provider =>
             {
-                var options = provider.GetRequiredService<IOptions<FirebaseConfig>>().Value;
                 return new FirebaseAuthClient(new FirebaseAuthConfig
                 {
-                    ApiKey = options.ApiKey,
-                    AuthDomain = options.AuthDomain,
+                    ApiKey = firebaseConfig.ApiKey,
+                    AuthDomain = firebaseConfig.AuthDomain,
                     Providers = new FirebaseAuthProvider[]
                     {
                     new EmailProvider()
                     }
                 });
             });
+            
+            services.AddSingleton<PubSubService>(provider =>
+            {
+                return new PubSubService(firebaseConfig.ProjectId, credential.ToChannelCredentials());
+            });
 
             services.AddSingleton(db);
             services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddControllers();
             services.AddSwaggerGen();

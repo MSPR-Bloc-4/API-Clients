@@ -16,12 +16,14 @@ namespace Client_Api.Repository
         private readonly FirebaseAuth _auth;
         private readonly FirebaseAuthClient _firebaseAuthClient;
         private readonly FirebaseConfig _firebaseConfig;
+        private readonly CollectionReference _collectionReference;
 
         public UserRepository(FirestoreDb firestoreDb, IOptions<FirebaseConfig> firebaseConfig, FirebaseAuthClient firebaseAuthClient)
         {
             _firestoreDb = firestoreDb;
             _firebaseConfig = firebaseConfig.Value;
             _firebaseAuthClient = firebaseAuthClient;
+            _collectionReference = _firestoreDb.Collection("User");
             FirebaseApp.Create(new AppOptions
             {
                 Credential = GoogleCredential.FromFile(_firebaseConfig.ServiceAccountPath)
@@ -38,16 +40,15 @@ namespace Client_Api.Repository
             };
 
             UserRecord userRecord = await _auth.CreateUserAsync(userRecordArgs);
-            CollectionReference usersRef = _firestoreDb.Collection("Users");
             user.CreatedAt = DateTime.UtcNow;
-            await usersRef.Document(userRecord.Uid).SetAsync(user);
+            await _collectionReference.Document(userRecord.Uid).SetAsync(user);
 
             return userRecord.Uid;
         }
 
         public async Task<User> GetUserById(string userId)
         {
-            DocumentReference docRef = _firestoreDb.Collection("Users").Document(userId);
+            DocumentReference docRef = _collectionReference.Document(userId);
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
             if (snapshot.Exists)
@@ -61,8 +62,7 @@ namespace Client_Api.Repository
 
         public async Task<List<User>> GetAllUsers()
         {
-            Query usersQuery = _firestoreDb.Collection("Users");
-            QuerySnapshot snapshot = await usersQuery.GetSnapshotAsync();
+            QuerySnapshot snapshot = await _collectionReference.GetSnapshotAsync();
             List<User> users = new List<User>();
 
             foreach (DocumentSnapshot documentSnapshot in snapshot.Documents)
@@ -76,13 +76,13 @@ namespace Client_Api.Repository
 
         public async Task UpdateUser(string userId, User user)
         {
-            DocumentReference docRef = _firestoreDb.Collection("Users").Document(userId);
+            DocumentReference docRef = _collectionReference.Document(userId);
             await docRef.SetAsync(user, SetOptions.Overwrite);
         }
 
         public async Task DeleteUser(string userId)
         {
-            DocumentReference docRef = _firestoreDb.Collection("Users").Document(userId);
+            DocumentReference docRef = _collectionReference.Document(userId);
             await docRef.DeleteAsync();
             await _auth.DeleteUserAsync(userId);
         }
