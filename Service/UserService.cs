@@ -1,18 +1,27 @@
+using Client_Api.Configuration;
 using Client_Api.Model;
 using Client_Api.Repository.Interface;
-using PubSubLibrary;
+using Client_Api.Service.Interface;
+using Google.Cloud.PubSub.V1;
+using Google.Protobuf;
+using Microsoft.Extensions.Options;
 
 namespace Client_Api.Service
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly PubSubService _pubSubService;
+        private readonly PublisherServiceApiClient _publisherClient;
+        private readonly FirebaseConfig _firebaseConfig;
 
-        public UserService(IUserRepository userRepository, PubSubService pubSubService)
+        public UserService(IUserRepository userRepository, IOptions<FirebaseConfig> firebaseConfig)
         {
             _userRepository = userRepository;
-            _pubSubService = pubSubService;
+            _firebaseConfig = firebaseConfig.Value;
+            _publisherClient = new PublisherServiceApiClientBuilder
+            {
+                CredentialsPath = _firebaseConfig.ServiceAccountPath
+            }.Build();
         }
 
         public async Task<string> CreateUser(string email, string password, User user)
@@ -40,7 +49,12 @@ namespace Client_Api.Service
             await _userRepository.DeleteUser(userId);
 
             string message = userId;
-            await _pubSubService.PublishMessageAsync("user-deleted", message);
+            TopicName topicName = new TopicName(_firebaseConfig.ProjectId, "user-deleted");
+            PubsubMessage pubsubMessage = new PubsubMessage
+            {
+                Data = ByteString.CopyFromUtf8(message)
+            };
+            await _publisherClient.PublishAsync(topicName, new[] { pubsubMessage });        
         }
 
         public async Task<string> LoginUser(string email, string password)
