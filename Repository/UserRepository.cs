@@ -13,22 +13,20 @@ namespace Client_Api.Repository
     public class UserRepository : IUserRepository
     {
         private readonly FirestoreDb _firestoreDb;
-        private readonly FirebaseAuth _auth;
+        private readonly FirebaseAuth? _auth;
         private readonly FirebaseAuthClient _firebaseAuthClient;
-        private readonly FirebaseConfig _firebaseConfig;
         private readonly CollectionReference _collectionReference;
 
-        public UserRepository(FirestoreDb firestoreDb, IOptions<FirebaseConfig> firebaseConfig, FirebaseAuthClient firebaseAuthClient)
-        {
+        public UserRepository(FirestoreDb firestoreDb, FirebaseAuthClient firebaseAuthClient, FirebaseAuth? auth = null)
+        { 
             _firestoreDb = firestoreDb;
-            _firebaseConfig = firebaseConfig.Value;
             _firebaseAuthClient = firebaseAuthClient;
             _collectionReference = _firestoreDb.Collection("User");
-            FirebaseApp.Create(new AppOptions
+            if (auth == null)
             {
-                Credential = GoogleCredential.FromFile(_firebaseConfig.ServiceAccountPath)
-            });
-            _auth = FirebaseAuth.DefaultInstance;
+                auth = FirebaseAuth.DefaultInstance;
+            }
+            _auth = auth;
         }
 
         public async Task<string> CreateUser(string email, string password, User user)

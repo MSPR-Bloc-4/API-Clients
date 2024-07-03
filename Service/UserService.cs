@@ -2,6 +2,7 @@ using Client_Api.Configuration;
 using Client_Api.Model;
 using Client_Api.Repository.Interface;
 using Client_Api.Service.Interface;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.PubSub.V1;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
@@ -16,11 +17,26 @@ namespace Client_Api.Service
 
         public UserService(IUserRepository userRepository, IOptions<FirebaseConfig> firebaseConfig)
         {
+            GoogleCredential credential;
+            if (Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS") != null)
+            {
+                using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS"))))
+                {
+                    credential = GoogleCredential.FromStream(stream);
+                }
+            }
+            else
+            {
+                using (var stream = new FileStream("firebase_credentials.json", FileMode.Open, FileAccess.Read))
+                {
+                    credential = GoogleCredential.FromStream(stream);
+                }
+            }
             _userRepository = userRepository;
             _firebaseConfig = firebaseConfig.Value;
             _publisherClient = new PublisherServiceApiClientBuilder
             {
-                CredentialsPath = _firebaseConfig.ServiceAccountPath
+                Credential = credential
             }.Build();
         }
 

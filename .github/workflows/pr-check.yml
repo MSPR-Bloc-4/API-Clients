@@ -45,4 +45,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: dotnet test Client-Api.Tests

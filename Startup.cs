@@ -5,6 +5,7 @@ using Client_Api.Service;
 using Client_Api.Service.Interface;
 using Firebase.Auth;
 using Firebase.Auth.Providers;
+using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 
@@ -21,15 +22,23 @@ namespace Client_Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            GoogleCredential credential;
+            if (Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS") != null)
+            {
+                using (var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS"))))
+                {
+                    credential = GoogleCredential.FromStream(stream);
+                }
+            }
+            else
+            {
+                using (var stream = new FileStream("firebase_credentials.json", FileMode.Open, FileAccess.Read))
+                {
+                    credential = GoogleCredential.FromStream(stream);
+                }
+            }
             services.Configure<FirebaseConfig>(_configuration.GetSection("FirebaseConfig"));
             var firebaseConfig = _configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
-
-            GoogleCredential credential;
-            using (var stream = new FileStream(firebaseConfig.ServiceAccountPath, FileMode.Open, FileAccess.Read))
-            {
-                credential = GoogleCredential.FromStream(stream);
-            }
-
             FirestoreDbBuilder builder = new FirestoreDbBuilder
             {
                 ProjectId = firebaseConfig.ProjectId,
@@ -50,6 +59,11 @@ namespace Client_Api
                     new EmailProvider()
                     }
                 });
+            });
+            
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = credential
             });
 
             services.AddSingleton(db);
