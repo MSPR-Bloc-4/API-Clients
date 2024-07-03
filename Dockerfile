@@ -23,9 +23,5 @@ ENV FIREBASE_CREDENTIALS_JSON=${FIREBASE_CREDENTIALS_JSON}
 # Copy the published output from build stage
 COPY --from=build-env /app/out .
 
-# Expose port and define environment variable
-EXPOSE 80
-ENV ASPNETCORE_URLS=http://*:80
-
 # Use CMD instead of ENTRYPOINT to allow easy overriding
 CMD ["dotnet", "Client-Api.dll"]
