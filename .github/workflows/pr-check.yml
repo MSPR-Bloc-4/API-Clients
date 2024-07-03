@@ -72,7 +72,12 @@ jobs:
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+          FIREBASE_PROJECTID: ${{ secrets.FIREBASE_PROJECTID }}
+          FIREBASE_APIKEY: ${{ secrets.FIREBASE_APIKEY }}
+          FIREBASE_AUTHDOMAIN: ${{ secrets.FIREBASE_AUTHDOMAIN }}
         run: |
-          dotnet sonarscanner begin /k:"MSPR-Bloc-4_API-Clients" /o:"mspr-bloc-4" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
+          dotnet sonarscanner begin /k:"MSPR-Bloc-4_API-Clients" /o:"mspr-bloc-4" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.verbose=true
+          dotnet build Client-Api.csproj
+          dotnet test Client-Api.Tests/Client-Api.Tests.csproj
           dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
