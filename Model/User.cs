@@ -17,6 +17,4 @@ public class User
     public DateTime CreatedAt { get; set; }
     [FirestoreProperty]
     public Adress Adress { get; set; }
-    [FirestoreProperty]
-    public List<string> OrderIds { get; set; }
 }

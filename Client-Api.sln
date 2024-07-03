@@ -9,4 +9,8 @@ Global
 		{FECB9B25-DF0F-41C5-81FC-E790C3865A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FECB9B25-DF0F-41C5-81FC-E790C3865A7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
 EndGlobal

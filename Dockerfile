@@ -2,17 +2,24 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
-# Copy everything
-COPY . ./
-# Restore as distinct layers
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
 RUN dotnet restore
-# Build and publish a release
+
+# Copy everything else and build
+COPY . ./
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+
+# Copy the published output from build stage
 COPY --from=build-env /app/out .
+
+# Expose port and define environment variable
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://*:80
-ENTRYPOINT ["dotnet", "Client-Api.dll"]
+
+# Use CMD instead of ENTRYPOINT to allow easy overriding
+CMD ["dotnet", "Client-Api.dll"]

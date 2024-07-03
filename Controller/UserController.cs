@@ -26,7 +26,6 @@ public class UserController : ControllerBase
             LastName = registerModel.LastName,
             Username = registerModel.Username,
             Adress = registerModel.Adress,
-            OrderIds = new List<string>()
         };
         var userId = await _userService.CreateUser(registerModel.Email, registerModel.Password, user);
         return Ok(new { UserId = userId });

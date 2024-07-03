@@ -8,5 +8,4 @@ public class RegisterModel
     public string LastName { get; set; }
     public string Username { get; set; }
     public Adress Adress { get; set; }
-    public List<string> OrderIds { get; set; }
 }
