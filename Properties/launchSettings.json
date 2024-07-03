@@ -17,7 +17,7 @@
       "applicationUrl": "http://localhost:5056",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "GOOGLE_APPLICATION_CREDENTIALS": "payetonkawa-84a8c-firebase-adminsdk-syfp3-6e4eaa43f5.json"
+        "GOOGLE_APPLICATION_CREDENTIALS": "firebase_credentials.json"
       }
     },
     "https": {
