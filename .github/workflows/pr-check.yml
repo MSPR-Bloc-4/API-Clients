@@ -51,24 +51,28 @@ jobs:
           FIREBASE_APIKEY: ${{ secrets.FIREBASE_APIKEY }}
           FIREBASE_AUTHDOMAIN: ${{ secrets.FIREBASE_AUTHDOMAIN }}
         run: dotnet test Client-Api.Tests
-  
+
   Analysis:
     needs: Build
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Install Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2.3.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=MSPR-Bloc-4_API-Clients
-            -Dsonar.organization=mspr-bloc-4
-            -Dsonar.verbose=true
-          projectBaseDir: .
+        run: |
+          dotnet sonarscanner begin /k:"MSPR-Bloc-4_API-Clients" /o:"mspr-bloc-4" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet build
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
