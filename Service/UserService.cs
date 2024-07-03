@@ -1,4 +1,4 @@
-using Client_Api.Configuration;
+using Client_Api.Helper;
 using Client_Api.Model;
 using Client_Api.Repository.Interface;
 using Client_Api.Service.Interface;
@@ -13,10 +13,10 @@ namespace Client_Api.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly PublisherServiceApiClient _publisherClient;
-        private readonly FirebaseConfig _firebaseConfig;
-
-        public UserService(IUserRepository userRepository, IOptions<FirebaseConfig> firebaseConfig)
+        private readonly string projectId;
+        public UserService(IUserRepository userRepository)
         {
+            var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECTID") ?? JsonReader.GetFieldFromJsonFile("project_id");
             GoogleCredential credential;
             if (Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS") != null)
             {
@@ -33,7 +33,6 @@ namespace Client_Api.Service
                 }
             }
             _userRepository = userRepository;
-            _firebaseConfig = firebaseConfig.Value;
             _publisherClient = new PublisherServiceApiClientBuilder
             {
                 Credential = credential
@@ -65,7 +64,7 @@ namespace Client_Api.Service
             await _userRepository.DeleteUser(userId);
 
             string message = userId;
-            TopicName topicName = new TopicName(_firebaseConfig.ProjectId, "user-deleted");
+            TopicName topicName = new TopicName(projectId, "user-deleted");
             PubsubMessage pubsubMessage = new PubsubMessage
             {
                 Data = ByteString.CopyFromUtf8(message)
