@@ -1,5 +1,4 @@
 using Client_Api.Model;
-using Client_Api.Service;
 using Client_Api.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 

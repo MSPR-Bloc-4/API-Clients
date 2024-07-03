@@ -1,4 +1,4 @@
-using Client_Api.Configuration;
+using Client_Api.Helper;
 using Client_Api.Model;
 using Client_Api.Repository;
 using Firebase.Auth;
@@ -8,7 +8,6 @@ using FirebaseAdmin.Auth;
 using Google.Api.Gax;
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
-using Microsoft.Extensions.Options;
 using Xunit;
 using User = Client_Api.Model.User;
 
@@ -19,7 +18,6 @@ namespace Client_Api.Tests
         private readonly FirestoreDb _firestoreDb;
         private readonly FirebaseAuthClient _firebaseAuthClient;
         private readonly string _testCollectionName = "User";
-        private readonly FirebaseConfig _firebaseConfig;
         private readonly FirebaseAuth? _auth;
 
         public UserRepositoryTests()
@@ -40,9 +38,9 @@ namespace Client_Api.Tests
                 }
             }
 
-            var projectId = "payetonkawa-84a8c";
-            var apiKey = "AIzaSyDVDIlqZABClELaAaWIEFjQ61TEQYmOohI";
-            var authDomain = "payetonkawa-84a8c.firebaseapp.com";
+            var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECTID") ?? JsonReader.GetFieldFromJsonFile("project_id");
+            var apiKey = Environment.GetEnvironmentVariable("FIREBASE_APIKEY") ?? JsonReader.GetFieldFromJsonFile("api_key");
+            var authDomain = Environment.GetEnvironmentVariable("FIREBASE_AUTHDOMAIN") ?? JsonReader.GetFieldFromJsonFile("auth_domain");
             var builder = new FirestoreDbBuilder
             {
                 Credential = credential,

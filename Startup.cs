@@ -1,4 +1,4 @@
-using Client_Api.Configuration;
+using Client_Api.Helper;
 using Client_Api.Repository;
 using Client_Api.Repository.Interface;
 using Client_Api.Service;
@@ -22,6 +22,9 @@ namespace Client_Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECTID") ?? JsonReader.GetFieldFromJsonFile("project_id");
+            var apiKey = Environment.GetEnvironmentVariable("FIREBASE_APIKEY") ?? JsonReader.GetFieldFromJsonFile("api_key");
+            var authDomain = Environment.GetEnvironmentVariable("FIREBASE_AUTHDOMAIN") ?? JsonReader.GetFieldFromJsonFile("auth_domain");
             GoogleCredential credential;
             if (Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS") != null)
             {
@@ -37,11 +40,10 @@ namespace Client_Api
                     credential = GoogleCredential.FromStream(stream);
                 }
             }
-            services.Configure<FirebaseConfig>(_configuration.GetSection("FirebaseConfig"));
-            var firebaseConfig = _configuration.GetSection("FirebaseConfig").Get<FirebaseConfig>();
+            
             FirestoreDbBuilder builder = new FirestoreDbBuilder
             {
-                ProjectId = firebaseConfig.ProjectId,
+                ProjectId = projectId,
                 DatabaseId = "user",
                 Credential = credential
             };
@@ -52,8 +54,8 @@ namespace Client_Api
             {
                 return new FirebaseAuthClient(new FirebaseAuthConfig
                 {
-                    ApiKey = firebaseConfig.ApiKey,
-                    AuthDomain = firebaseConfig.AuthDomain,
+                    ApiKey = apiKey,
+                    AuthDomain = authDomain,
                     Providers = new FirebaseAuthProvider[]
                     {
                     new EmailProvider()
