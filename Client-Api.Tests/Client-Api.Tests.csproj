@@ -10,6 +10,7 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
         <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+        <SonarQubeTestProject>true</SonarQubeTestProject>
     </PropertyGroup>
 
     <ItemGroup>
