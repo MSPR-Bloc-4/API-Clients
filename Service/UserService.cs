@@ -16,7 +16,7 @@ namespace Client_Api.Service
         private readonly string projectId;
         public UserService(IUserRepository userRepository)
         {
-            var projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECTID") ?? JsonReader.GetFieldFromJsonFile("project_id");
+            projectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECTID") ?? JsonReader.GetFieldFromJsonFile("project_id");
             GoogleCredential credential;
             if (Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS") != null)
             {
